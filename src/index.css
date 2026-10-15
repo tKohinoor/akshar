@@ -1,0 +1,59 @@
+:root {
+  color-scheme: dark;
+  --bg: #101b3a;
+  --text: #efeaf7;
+  --muted: rgba(239, 234, 247, 0.7);
+  --accent: #e8a317;
+  --surface: #1a2750;
+  --border: #2c3a6b;
+  --gold: #e8a317;
+  --on-gold: #101b3a;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f7f5fb;
+  --text: #16213f;
+  --muted: rgba(22, 33, 63, 0.7);
+  --accent: #8a5a00;
+  --surface: #e9e6f2;
+  --border: #d5d0e6;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.offline-notice {
+  padding: 0.6rem 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  background: var(--border);
+  color: var(--text);
+}
+
+.theme-toggle {
+  min-width: 48px;
+  min-height: 44px;
+  padding: 0 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+}

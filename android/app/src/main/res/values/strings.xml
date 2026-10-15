@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Akshar</string>
+    <string name="title_activity_main">Akshar</string>
+    <string name="package_name">com.syncperfect.akshar</string>
+    <string name="custom_url_scheme">com.syncperfect.akshar</string>
+</resources>
