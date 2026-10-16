@@ -85,3 +85,7 @@
   color: var(--on-gold);
   font-weight: 600;
 }
+
+.ad-slot {
+  height: 120px;
+}

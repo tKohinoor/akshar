@@ -7,6 +7,7 @@ import { useSettings } from './useSettings'
 import { FONT_SIZES } from './settings'
 import './Reader.css'
 import ThemeToggle from './ThemeToggle'
+import ChapterEndAd from './ChapterEndAd'
 
 function Reader() {
   const { id, n } = useParams()
@@ -109,8 +110,6 @@ function Reader() {
               <Markdown>{text}</Markdown>
             </article>
 
-            {/* The chapter-end ad will go here */}
-
             <div className="reader-nav">
               {prev ? (
                 <Link
@@ -135,6 +134,8 @@ function Reader() {
                 </Link>
               )}
             </div>
+
+            <ChapterEndAd />
           </>
         )}
       </div>
