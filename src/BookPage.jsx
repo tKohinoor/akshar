@@ -5,6 +5,8 @@ import { getProgress } from './progress'
 import Cover from './Cover'
 import ThemeToggle from './ThemeToggle'
 import './BookPage.css'
+import { getBooks, prefetchChapter } from './api'
+import BackLink from './BackLink'
 
 function BookPage() {
   const { id } = useParams()
@@ -38,12 +40,16 @@ function BookPage() {
       ? book.chapters.find((c) => c.number === progress.chapter)
       : null
 
+  useEffect(() => {
+    if (!book) return
+    const target = resume ?? book.chapters[0]
+    if (target) prefetchChapter(book.id, target.number)
+  }, [book, resume])
+
   return (
     <div className="page">
       <div className="page-top">
-        <Link to="/" className="back">
-          Back to library
-        </Link>
+        <BackLink to="/" label="Back to library" />
         <ThemeToggle />
       </div>
 

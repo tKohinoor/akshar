@@ -8,6 +8,8 @@ import { FONT_SIZES } from './settings'
 import './Reader.css'
 import ThemeToggle from './ThemeToggle'
 import ChapterEndAd from './ChapterEndAd'
+import { getBooks, getChapter, prefetchChapter } from './api'
+import BackLink from './BackLink'
 
 function Reader() {
   const { id, n } = useParams()
@@ -34,6 +36,11 @@ function Reader() {
         setText(chapterText)
         setStatus('ready')
         saveProgress(id, number)
+        // Quietly save the next two chapters so tapping Next is instant
+        const at = found.chapters.findIndex((c) => c.number === number)
+        found.chapters
+          .slice(at + 1, at + 3)
+          .forEach((c) => prefetchChapter(id, c.number))
         window.scrollTo(0, 0)
       })
       .catch(() => {
@@ -63,9 +70,7 @@ function Reader() {
     >
       <div className="reader-inner">
         <nav className="reader-top">
-          <Link to={`/book/${id}`} className="back">
-            Chapters
-          </Link>
+          <BackLink to={`/book/${id}`} label="Back to chapters" />
           {book && <span className="reader-book">{book.title}</span>}
         </nav>
 

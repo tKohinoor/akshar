@@ -28,6 +28,7 @@ async function writeSaved(key, value) {
 let booksMemory = null
 let booksText = null
 let refreshPromise = null
+let initialLoad = null
 let lastCheck = 0
 
 async function downloadBooks() {
@@ -56,37 +57,44 @@ function checkForNewBooks() {
   return refreshPromise
 }
 
-export async function getBooks(onFresh) {
-  // 1. Use what is already in memory, or load the saved copy from the device
-  if (!booksMemory) {
-    const saved = await readSaved(BOOKS_KEY)
-    if (saved) {
-      try {
-        booksMemory = JSON.parse(saved)
-        booksText = saved
-      } catch {
-        // damaged copy: ignore it and download a fresh one
-      }
+// Runs once: use the saved copy if there is one, otherwise download
+async function loadInitial() {
+  const saved = await readSaved(BOOKS_KEY)
+  if (saved) {
+    try {
+      booksMemory = JSON.parse(saved)
+      booksText = saved
+    } catch {
+      // damaged copy: ignore it and download a fresh one
     }
   }
+  if (!booksMemory) {
+    await downloadBooks()
+    lastCheck = Date.now()
+  }
+}
 
-  // 2. Have a copy? Show it now, and quietly look for updates
-  if (booksMemory) {
-    checkForNewBooks().then((changed) => {
-      if (changed && onFresh) onFresh(booksMemory)
-    })
-    return booksMemory
+export async function getBooks(onFresh) {
+  if (!booksMemory) {
+    // Everyone who asks while the first load is running shares that one load
+    if (!initialLoad) {
+      initialLoad = loadInitial().finally(() => {
+        initialLoad = null
+      })
+    }
+    await initialLoad
   }
 
-  // 3. Nothing saved yet (first launch): the internet is needed this once
-  await downloadBooks()
-  lastCheck = Date.now()
+  checkForNewBooks().then((changed) => {
+    if (changed && onFresh) onFresh(booksMemory)
+  })
   return booksMemory
 }
 
 // ---------- chapters ----------
 
 const checkedThisSession = new Set()
+const inflight = new Map()
 
 function chapterKey(bookId, number) {
   return `akshar-ch-${bookId}-${String(number).padStart(2, '0')}`
@@ -104,6 +112,18 @@ async function downloadChapter(bookId, number) {
   return text
 }
 
+// If the same chapter is already downloading, share that download
+function downloadChapterOnce(bookId, number) {
+  const key = chapterKey(bookId, number)
+  if (!inflight.has(key)) {
+    inflight.set(
+      key,
+      downloadChapter(bookId, number).finally(() => inflight.delete(key))
+    )
+  }
+  return inflight.get(key)
+}
+
 export async function getChapter(bookId, number) {
   const key = chapterKey(bookId, number)
   const saved = await readSaved(key)
@@ -112,7 +132,7 @@ export async function getChapter(bookId, number) {
     // Saved on this device: show it now, and check for a newer copy once per session
     if (!checkedThisSession.has(key)) {
       checkedThisSession.add(key)
-      downloadChapter(bookId, number)
+      downloadChapterOnce(bookId, number)
         .then((text) => {
           if (text !== saved) writeSaved(key, text)
         })
@@ -122,7 +142,19 @@ export async function getChapter(bookId, number) {
   }
 
   // Not saved yet: download it, then save it for next time
-  const text = await downloadChapter(bookId, number)
+  const text = await downloadChapterOnce(bookId, number)
   await writeSaved(key, text)
   return text
+}
+
+// Quietly download a chapter the reader is likely to open next
+export async function prefetchChapter(bookId, number) {
+  const key = chapterKey(bookId, number)
+  try {
+    if (await readSaved(key)) return
+    const text = await downloadChapterOnce(bookId, number)
+    await writeSaved(key, text)
+  } catch {
+    // Offline or failed: the chapter downloads normally when opened
+  }
 }

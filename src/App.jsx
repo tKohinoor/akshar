@@ -5,17 +5,14 @@ import Home from './Home'
 import BookPage from './BookPage'
 import Reader from './Reader'
 import OfflineNotice from './OfflineNotice'
+import { getBooks } from './api'
 
 function App() {
   const [showSplash, setShowSplash] = useState(true)
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 2600)
-    return () => clearTimeout(timer)
-  }, [])
-  
-  useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 2600)
+    getBooks().catch(() => {}) // start loading the library while the splash plays
+    const timer = setTimeout(() => setShowSplash(false), 2200)
     return () => clearTimeout(timer)
   }, [])
 
