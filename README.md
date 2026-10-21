@@ -1,8 +1,3 @@
-Here’s the complete `README.md` file content. Copy it into a file named `README.md` in your repository root.
-
-markdown
-````
-
 # Akshar 📚
 
 **A simple, reader-focused digital library for books and chapters.**
@@ -192,4 +187,3 @@ No license information is currently specified in this repository. Until a licens
 ---
 
 Built with ❤️ using React, Vite, and Capacitor.
-````
