@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getBooks } from './api'
 import { getProgress } from './progress'
 import Cover from './Cover'
 import ThemeToggle from './ThemeToggle'

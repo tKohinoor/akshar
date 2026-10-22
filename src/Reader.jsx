@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import Markdown from 'react-markdown'
-import { getBooks, getChapter } from './api'
 import { saveProgress } from './progress'
 import { useSettings } from './useSettings'
 import { FONT_SIZES } from './settings'
